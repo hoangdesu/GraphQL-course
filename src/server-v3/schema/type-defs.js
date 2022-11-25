@@ -1,16 +1,18 @@
 const { gql } = require("apollo-server");
 
 const typeDefs = gql`
-    type Champions {
+    type Champion {
         id: ID!
         name: String!
         role: [Role!]!
         isMeta: Boolean!
+        strongAgainst: [Champion!]
     }
 
     type Query {
         hi: String
-        champions: [Champions!]!
+        champions: [Champion!]!
+        champion(id: ID!): Champion
     }
 
     enum Role {
