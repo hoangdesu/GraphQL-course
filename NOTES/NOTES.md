@@ -131,3 +131,24 @@ module.exports = { resolvers };
 ```
 - includes a resolvers object with key `Query`
 - each field in `Query` object is a function that returns a value, matching the name in typeDefs
+
+## Querying data
+- open Apollo server at http://localhost:4000/
+- sample run: ![](20221125225755.png)
+
+# 4. GraphQL resolvers
+
+## enum
+- enumerate type: a special kind of scalar that is restricted to a particular set of allowed values
+- by convention, values are in capital (e.g. MID)
+- results will be resolved to string (e.g "MID")
+- define with keyword `enum`, used as a normal type
+  ```
+  enum Role {
+      TOP
+      JUNGLE
+      MID
+      ADC
+      SUPPORT
+  }
+  ```
