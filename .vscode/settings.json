@@ -1,7 +1,6 @@
 {
     "workbench.startupEditor": "none",
     "workbench.colorCustomizations": {
-      // "terminal.background":"#131212",
       "terminal.foreground": "#dddad6",
       "terminal.ansiBlack": "#1D2021",
       "terminal.ansiBrightBlack": "#665C54",
@@ -12,7 +11,7 @@
       "terminal.ansiBrightRed": "#FB543F",
       "terminal.ansiBrightWhite": "#FDF4C1",
       "terminal.ansiBrightYellow": "#FAC03B",
-      "terminal.ansiBlue": "#0670fa", // <- use this color
+      "terminal.ansiBlue": "#0670fa",
       "terminal.ansiCyan": "#8BA59B",
       "terminal.ansiGreen": "#95C085",
       "terminal.ansiMagenta": "#8F4673",
