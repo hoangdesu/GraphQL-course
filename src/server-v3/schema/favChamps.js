@@ -54,7 +54,7 @@ const favoriteChamps = [
     {
         id: 5,
         name: 'Lee Sin',
-        role: ['JUNGLE', 'TOP', 'SUPPORT'],
+        role: ['JUNGLE', 'TOP', 'SUPPORT', 'MID'],
         isMeta: true
     },
     {

@@ -97,7 +97,7 @@ const typeDefs = gql`
     type Champions {
         id: ID!
         name: String!
-        role: [String!]!
+        roles: [String!]!
         isMeta: Boolean!
     }
 
@@ -191,7 +191,7 @@ module.exports = { resolvers };
   type Champion {
       id: ID!
       name: String!
-      role: [Role!]!
+      roles: [Role!]!
       isMeta: Boolean!
       strongAgainst: [Champion!]
   }
@@ -214,12 +214,13 @@ module.exports = { resolvers };
 - The **`args`** argument: an object that contains all GraphQL arguments that were provided for the field by the GraphQL operation => e.g. accessing id field with `args.id`
 
 **Writing query in Apollo server**
+
 - write a separate query with argument, prefix with $:
   ```
   query ChampionQuery($championId: ID!) {
     champion(id: $championId) {
       name
-      role
+      roles
       strongAgainst {
         name
       }
@@ -233,11 +234,41 @@ module.exports = { resolvers };
 **Extra: Lodash basic**
 
 - using Lodash's find() function:
+
   ```
   const _ = require('lodash');
 
   const { id } = args;
   // find in the list with the following id, make it a Number type
-  return _.find(favoriteChamps, { id: Number(id) }); 
+  return _.find(favoriteChamps, { id: Number(id) });
   ```
 
+## Type can have its own resolvers
+
+- each type can have its own resolvers
+- that resolver is scoped to only that type, can only access that resolver from type. e.g:
+  ```
+  Champion: {
+        game: () => {
+            return "League of Legends";
+        },
+        abilities: () => {
+            return ['Passive', 'Q', 'W', 'E', 'R'];
+        },
+        midChamps: () => {
+            return _.filter(favoriteChamps, (champ) => {
+                for (const role of champ.roles) {
+                    if (roles === 'MID') {
+                        return champ;
+                    }
+                }
+            });
+        }
+    }
+  ```
+
+# 5. Mutations
+
+- used to modify, or mutate data
+- versus HTTP: `query` = `GET` request; `mutation` = `POST`, `PUT`, `DELETE`
+> technically, any query could be implemented to cause a data write. However, it's useful to establish a convention that any operations that cause writes should be sent explicitly via a mutation.write
