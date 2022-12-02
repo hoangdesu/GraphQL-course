@@ -28,6 +28,17 @@ const typeDefs = gql`
         ADC
         SUPPORT
     }
+
+    input addChampionInput {
+        name: String!
+        roles: [Role!] = [MID] # ARAM time!
+        isMeta: Boolean = false # default value
+    }
+
+    type Mutation {
+        addChampion(input: addChampionInput!): Champion!
+        updateChampion(id: ID!, name: String!, newName: String!): Champion
+    }
 `
 
 module.exports = { typeDefs };

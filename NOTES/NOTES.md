@@ -271,4 +271,40 @@ module.exports = { resolvers };
 
 - used to modify, or mutate data
 - versus HTTP: `query` = `GET` request; `mutation` = `POST`, `PUT`, `DELETE`
-> technically, any query could be implemented to cause a data write. However, it's useful to establish a convention that any operations that cause writes should be sent explicitly via a mutation.write
+- > technically, any query could be implemented to cause a data write. However, it's useful to establish a convention that any operations that cause writes should be sent explicitly via a mutation.
+- mutation's fields should be verbs e.g. `createUser`
+- common convention: whenever we modify a type, just return that type 
+- (-> because GQL uses a lot of caching, we have to return itself to ensure it is the latest state possible)
+- use `input` to group arguments
+- similar to query using positional arguments, can pass data from `Variables` tab and access argument input from `args.input`
+- **type-defs.js:**
+  ```
+  input addChampionInput {
+    name: String!
+    roles: [Role!] = [MID] # 
+    isMeta: Boolean = false # default value
+  }
+
+  type Mutation {
+      addChampion(input: addChampionInput!): Champion
+  }
+
+  ```
+- **resolvers.js:**
+  ```
+    Mutation: {
+      addChampion: (_parent, args) => {
+          const newId = favoriteChamps.length + 1;
+          const champ = {
+              ...args.input,
+              id: newId
+          } 
+          console.log(champ);
+          favoriteChamps.push(champ);
+          return champ;
+      },
+    }
+  ```
+- **Output:**
+
+  ![](20221203024030.png)  

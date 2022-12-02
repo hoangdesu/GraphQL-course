@@ -40,7 +40,7 @@ const resolvers = {
             return ['Passive', 'Q', 'W', 'E', 'R'];
         },
         whatever: () => {
-            return 'whatever from champion'; // different from same method in query
+            return 'whatever from champion'; // different from same method in query type
         },
         midChamps: () => {
             return _.filter(favoriteChamps, (champ) => {
@@ -50,6 +50,31 @@ const resolvers = {
                     }
                 }
             });
+        }
+    },
+
+    Mutation: {
+        addChampion: (_parent, args) => {
+            const newId = favoriteChamps.length + 1;
+            const champ = {
+                ...args.input,
+                id: newId
+            } 
+            console.log(champ);
+            favoriteChamps.push(champ);
+            return champ;
+        },
+        updateChampion(_parent, args) {
+            console.log('ok');
+            for (const champ in favoriteChamps) {
+                if (champ.id === parseInt(args.id) && champ.name === args.name) {
+                    champ.name = args.newName;
+                    champ.id = favoriteChamps.length + 1;
+                    
+                    return champ;
+                }
+            }
+            return null;
         }
     }
 };
