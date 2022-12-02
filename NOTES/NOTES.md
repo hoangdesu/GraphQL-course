@@ -307,4 +307,21 @@ module.exports = { resolvers };
   ```
 - **Output:**
 
-  ![](20221203024030.png)  
+  ![](20221203024030.png)
+
+- **Update champion resolver:**
+  ```
+  updateChampion(_parent, args) {
+    console.log('arg inputs:');
+    console.log(args.id);
+    console.log(args.name);
+    console.log(args.newName);
+    for (const champ of favoriteChamps) {
+        if (champ.id === parseInt(args.id) && champ.name === args.name) {
+            champ.name = args.newName;
+            return champ;
+        }
+    }
+    return null;
+  } 
+  ```

@@ -65,16 +65,16 @@ const resolvers = {
             return champ;
         },
         updateChampion(_parent, args) {
-            console.log('ok');
-            for (const champ in favoriteChamps) {
+            console.log('arg inputs:');
+            console.log(args.id);
+            console.log(args.name);
+            console.log(args.newName);
+            for (const champ of favoriteChamps) {
                 if (champ.id === parseInt(args.id) && champ.name === args.name) {
                     champ.name = args.newName;
-                    champ.id = favoriteChamps.length + 1;
-                    
                     return champ;
                 }
             }
-            return null;
         }
     }
 };
