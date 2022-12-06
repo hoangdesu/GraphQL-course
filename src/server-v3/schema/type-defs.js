@@ -18,7 +18,6 @@ const typeDefs = gql`
         champions: [Champion!]!
         champion(id: ID!): Champion
         whatever: String
-        remove(id: ID!): Champion
     }
 
     enum Role {
@@ -31,13 +30,14 @@ const typeDefs = gql`
 
     input addChampionInput {
         name: String!
-        roles: [Role!] = [MID] # ARAM time!
+        roles: [Role!]! = [MID] # ARAM time!
         isMeta: Boolean = false # default value
     }
 
     type Mutation {
         addChampion(input: addChampionInput!): Champion!
         updateChampion(id: ID!, name: String!, newName: String!): Champion
+        removeChampion(id: ID!): Champion
     }
 `
 

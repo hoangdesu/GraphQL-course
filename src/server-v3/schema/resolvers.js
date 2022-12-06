@@ -19,16 +19,6 @@ const resolvers = {
                 const id = parseInt(args.id); // args always get passed in as string
                 return favoriteChamps.find(champ => champ.id === id);
             }
-        },
-        whatever: () => {
-            return 'whatever from query';
-        },
-        remove: (_parent, args) => {
-            console.log(args.id);
-            console.log('before:', favoriteChamps.length);
-            console.log('after:', favoriteChamps.length);
-            return favoriteChamps.pop();
-
         }
     },
 
@@ -39,12 +29,9 @@ const resolvers = {
         abilities: () => {
             return ['Passive', 'Q', 'W', 'E', 'R'];
         },
-        whatever: () => {
-            return 'whatever from champion'; // different from same method in query type
-        },
         midChamps: () => {
             return _.filter(favoriteChamps, (champ) => {
-                for (const role of champ.role) {
+                for (const role of champ.roles) {
                     if (role === 'MID') {
                         return champ;
                     }
@@ -64,6 +51,7 @@ const resolvers = {
             favoriteChamps.push(champ);
             return champ;
         },
+
         updateChampion(_parent, args) {
             console.log('arg inputs:');
             console.log(args.id);
@@ -75,6 +63,18 @@ const resolvers = {
                     return champ;
                 }
             }
+        },
+
+        removeChampion: (_parent, args) => {
+            for (const [i, champ] of favoriteChamps.entries()) {
+                if (champ.id === parseInt(args.id)) {
+                    const removedChamp = favoriteChamps.splice(i, 1)[0]; // splice(start, deleteCount), returns an array, get the first element
+                    console.log('removed:', removedChamp);
+                    return removedChamp;
+                }
+            }
+            console.log('no champ removed');
+            return null;
         }
     }
 };
