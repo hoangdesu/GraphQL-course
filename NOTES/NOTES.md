@@ -294,7 +294,8 @@ module.exports = { resolvers };
   ```
     Mutation: {
       addChampion: (_parent, args) => {
-          const newId = favoriteChamps.length + 1;
+          const lastIndex = favoriteChamps.length - 1;
+          const newId = favoriteChamps[lastIndex].id + 1;
           const champ = {
               ...args.input,
               id: newId
@@ -325,3 +326,19 @@ module.exports = { resolvers };
     return null;
   } 
   ```
+- **Remove champion resolver:**
+  ```
+  removeChampion: (_parent, args) => {
+    for (const [i, champ] of favoriteChamps.entries()) {
+        if (champ.id === parseInt(args.id)) {
+            const removedChamp = favoriteChamps.splice(i, 1)[0]; // splice(start, deleteCount), returns an array, get the first element
+            console.log('removed:', removedChamp);
+            return removedChamp;
+        }
+    }
+    console.log('no champ removed');
+    return null;
+  }
+  ```
+# 6. UseQuery Hook in Apollo Client
+// TODO: ep6

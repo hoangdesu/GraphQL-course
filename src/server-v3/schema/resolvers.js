@@ -42,7 +42,8 @@ const resolvers = {
 
     Mutation: {
         addChampion: (_parent, args) => {
-            const newId = favoriteChamps.length + 1;
+            const lastIndex = favoriteChamps.length - 1;
+            const newId = favoriteChamps[lastIndex].id + 1;
             const champ = {
                 ...args.input,
                 id: newId
