@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
-import ChampionRow from './ChampionRow';
+import ChampionRow, { Champion } from './ChampionRow';
 
 const GET_ALL_CHAMPS = gql`
     query getAllChamps {
@@ -14,17 +14,19 @@ const GET_ALL_CHAMPS = gql`
 `;
 
 const Champions = () => {
-    const { data, loading, error } = useQuery(GET_ALL_CHAMPS);
+    const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
 
-    if (loading) {
-        return <p>Loading...</p>
+    if (champLoading) {
+        return <p>Loading...</p>;
     }
-    
-    if (error) {
-        return <p style={{ color: 'red' }}>Error</p>
+
+    if (champError) {
+        return <p style={{ color: 'red' }}>Error querying champions</p>;
     }
-    
-    {data && console.log(data)};
+
+    {
+        champData && console.log(champData);
+    }
 
     return (
         <div>
@@ -39,14 +41,13 @@ const Champions = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.champions.map(champion => (
+                    {champData.champions.map((champion: Champion) => (
                         <ChampionRow key={champion.id} champion={champion} />
                     ))}
                 </tbody>
             </table>
-
         </div>
-    )
-}
+    );
+};
 
-export default Champions
+export default Champions;

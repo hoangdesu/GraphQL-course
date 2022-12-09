@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 
-interface Champion {
+export interface Champion {
     id: number;
     name: string;
     roles: string[];
@@ -19,7 +19,6 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion: champ }) =
       if (index < champ.roles.length - 1) roleStr += ' / ';
   })
 
-  
   return (
     <tr>
         <td>{champ.id}</td>

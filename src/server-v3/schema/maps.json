@@ -1,0 +1,30 @@
+[
+    {
+        "id": "sr",
+        "name": "Summoner's Rift",
+        "players": "5v5",
+        "playable": true,
+        "imageUrl": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/league-of-legends/6/65/Summoners_rift_season_4_map-820x420.jpg?width=960"
+    },
+    {
+        "id": "tt",
+        "name": "Twisted Treeline",
+        "players": "3v3",
+        "playable": false,
+        "imageUrl": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/league-of-legends/c/c2/Treeline_map.png?width=960"
+    },
+    {
+        "id": "ha",
+        "name": "Howling Abyss",
+        "players": "5v5",
+        "playable": true,
+        "imageUrl": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/league-of-legends/5/5f/Howling_Abyss_Map_Preview.jpg?width=960"
+    },
+    {
+        "id": "tcs",
+        "name": "The Crystal Scar",
+        "players": "5v5",
+        "playable": false,
+        "imageUrl": "https://oyster.ignimgs.com/mediawiki/apis.ign.com/league-of-legends/4/45/Crystal_Scar_Map_Preview.jpg?width=960"
+    }
+]

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import Champions from './components/Champions';
+import Maps from './components/Maps';
 
 const App = () => {
   const client = new ApolloClient({
@@ -11,8 +12,8 @@ const App = () => {
   return (
     <ApolloProvider client={client}>
       <div className="App">
-        <h1>App</h1>
         <Champions />
+        <Maps />
       </div>
     </ApolloProvider>
   )

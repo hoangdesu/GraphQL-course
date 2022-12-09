@@ -1,4 +1,5 @@
-const { favoriteChamps } = require('./favChamps');
+const { favoriteChamps } = require('./favoriteChamps');
+const fs = require('fs');
 const _ = require('lodash');
 
 const resolvers = {
@@ -19,6 +20,10 @@ const resolvers = {
                 const id = parseInt(args.id); // args always get passed in as string
                 return favoriteChamps.find(champ => champ.id === id);
             }
+        },
+        maps: () => {
+            const mapsFile = fs.readFileSync(`${__dirname}/maps.json`); // must get current working directory first
+            return JSON.parse(mapsFile);
         }
     },
 

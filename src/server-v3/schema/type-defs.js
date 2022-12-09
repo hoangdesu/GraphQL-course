@@ -13,11 +13,20 @@ const typeDefs = gql`
         midChamps: [Champion!]
     }
 
+    type Map {
+        id: ID!
+        name: String!
+        players: String!
+        playable: Boolean!
+        imageUrl: String!
+    }
+
     type Query {
         hi: String
         champions: [Champion!]!
         champion(id: ID!): Champion
         whatever: String
+        maps: [Map!]!
     }
 
     enum Role {
@@ -39,6 +48,7 @@ const typeDefs = gql`
         updateChampion(id: ID!, name: String!, newName: String!): Champion
         removeChampion(id: ID!): Champion
     }
+
 `
 
 module.exports = { typeDefs };
