@@ -21,12 +21,18 @@ const typeDefs = gql`
         imageUrl: String!
     }
 
+    input ChampionInputFilter {
+        id: ID
+        name: String
+    }
+
     type Query {
         hi: String
         champions: [Champion!]!
         champion(id: ID!): Champion
         whatever: String
         maps: [Map!]!
+        champIdOrName(filters: ChampionInputFilter!): Champion
     }
 
     enum Role {

@@ -24,6 +24,18 @@ const resolvers = {
         maps: () => {
             const mapsFile = fs.readFileSync(`${__dirname}/maps.json`); // must get current working directory first
             return JSON.parse(mapsFile);
+        },
+        champIdOrName: (_parent, args) => {
+            const { id, name } = args.filters;
+            
+            if (id) {
+                // same as above
+                return favoriteChamps.find(champ => champ.id === parseInt(id)); 
+            } else if (name) {
+                return favoriteChamps.find(champ => champ.name === name);
+            }
+            
+            return null;
         }
     },
 
