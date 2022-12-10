@@ -36,6 +36,9 @@ const resolvers = {
             }
             
             return null;
+        },
+        hello: (_parent, args) => {
+            return `Hello ${args.name}`;
         }
     },
 

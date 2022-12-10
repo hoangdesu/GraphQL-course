@@ -33,6 +33,7 @@ const typeDefs = gql`
         whatever: String
         maps: [Map!]!
         champIdOrName(filters: ChampionInputFilter!): Champion
+        hello(name: String!): String!
     }
 
     enum Role {
