@@ -38,7 +38,7 @@ const QUERY_TEST = gql`
 `;
 
 const QUERY_ZED = gql`
-    query Champion($id: String!) {
+    query Champion($id: ID!) {
         champion(id: $id) {
             name
         }
