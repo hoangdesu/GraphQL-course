@@ -3,8 +3,7 @@ import { useQuery, gql, useLazyQuery } from '@apollo/client';
 import ChampionRow, { Champion } from './ChampionRow';
 
 const GET_ALL_CHAMPS = gql`
-    query getAllChamps {
-        # this line is optional
+    query getAllChamps { # this line is optional
         champions {
             id
             name
@@ -15,39 +14,22 @@ const GET_ALL_CHAMPS = gql`
 `;
 
 const QUERY_A_CHAMPION = gql`
-    query QUERY_A_CHAMPION($id: String!) {
+    query GetChampByID($id: ID!) {
         champion(id: $id) {
             id
             name
-            # roles
-            # isMeta
-            # strongAgainst
-            # game
-            # abilities
+            roles
+            isMeta
+            # strongAgainst # this field ALONE will cause error, cuz it needs to know the fields inside needed for query!!!
+            strongAgainst {
+                id
+                name
+                roles
+                isMeta
+            }
+            game
+            abilities
         }
-    }
-`;
-
-const QUERY_TEST = gql`
-    {
-        champion {
-            name
-            id
-        }
-    }
-`;
-
-const QUERY_ZED = gql`
-    query Champion($id: ID!) {
-        champion(id: $id) {
-            name
-        }
-    }
-`;
-
-const HELLO_NAME = gql`
-    query Hello($name: String!) {
-        hello(name: $name)
     }
 `
 
@@ -56,34 +38,29 @@ const Champions = () => {
     const searchedChampRef = useRef(initialValue);
 
     const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
+    
     const [fetchChampion, { data: searchedChampData, error: searchedError }] =
-        useLazyQuery(QUERY_A_CHAMPION);
-
-    // const [test, { data: testData }] = useLazyQuery(QUERY_A_CHAMPION, {
-    //     variables: {
-    //         id: 1
-    //     }
-    // });
-
-    const { data: zedData } = useQuery(QUERY_ZED, {
-        variables: { id: "1" }
-    });
-
-    const [fetchNameData, { data: nameData }] = useLazyQuery(HELLO_NAME, {
-        variables: { name: searchedChampRef.current.value }
-    });
-
-    const performSearch = () => {
-        fetchChampion({
-            variables: {
-                id: {
-                    // name: 'Zed'
-                    id: '1'
-                }
-            }
+        useLazyQuery(QUERY_A_CHAMPION, {
+            variables: { id: searchedChampRef.current.value }
         });
+
+
+    const performSearch = async () => {
+        
+        // method 1: passing the options object into the returned fetch function, with id as variable
+        // await fetchChampion({
+        //     variables: { 
+        //         id: searchedChampRef.current.value
+        //     }
+        // });
+
+        // method 2: passing the options object as the 2nd param into the useLazyQueryHook
+        await fetchChampion(); // have to await to finish fetching before clearing input
+
+        // >> method 1 variable (in function) will overwrite method 2 (in query)
+
         console.log('search for:', searchedChampRef.current.value);
-        searchedChampRef.current.value = '';
+        searchedChampRef.current.value = ''; // fetch is async, so input will be clear first before feeding into param => causing null
     };
 
     const searchInputEnterHandler = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -108,6 +85,8 @@ const Champions = () => {
         console.log('Search error:', searchedError.message);
     }
 
+    console.log('searched champ data:', searchedChampData);
+
     return (
         <div>
             <h1>Favorite Champs</h1>
@@ -130,21 +109,23 @@ const Champions = () => {
             <h2>Search for a champion</h2>
             <input type="text" ref={searchedChampRef} onKeyDown={searchInputEnterHandler} />
             <button onClick={searchButtonClickHandler}>Search</button>
-            
-            <button
-                onClick={() => {
-                    // test();
-                    // console.log('testing:', testData);
-                    fetchNameData();
-                }}
-            >
-                Hi
-            </button>
 
-            <p>{searchedChampData ? searchedChampData.champion.name : 'champ name'}</p>
-
-            <h3>Zed data: {zedData && zedData.champion.name}</h3>
-            <h4>Name data: {nameData ? nameData.hello : ''}</h4>
+            {searchedChampData?.champion ? (
+                <div>
+                    <p>ID: {searchedChampData?.champion.id}</p>
+                    <p>Name: {searchedChampData?.champion.name}</p>
+                    <p>Roles: {searchedChampData?.champion.roles.join(', ')}</p>
+                    <p>Is meta: {searchedChampData?.champion.isMeta ? '🔥' : '💩'}</p>
+                    <p>
+                        Strong against:{' '}
+                        {searchedChampData?.champion?.strongAgainst?.map((c) => c.name)}
+                    </p>
+                    <p>Game: {searchedChampData?.champion.game}</p>
+                    <p>Abilities: {searchedChampData?.champion.abilities.join(' - ')}</p>
+                </div>
+            ) : (
+                <p>No champion found</p>
+            )}
         </div>
     );
 };
