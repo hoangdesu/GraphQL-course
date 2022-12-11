@@ -5,7 +5,7 @@ import Maps from './components/Maps';
 
 const App = () => {
   const client = new ApolloClient({
-    uri: 'http://localhost:4000',
+    uri: 'http://localhost:4000', // apollo server endpoint
     cache: new InMemoryCache()
   })
 

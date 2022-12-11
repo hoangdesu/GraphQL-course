@@ -3,7 +3,8 @@ import { useQuery, gql, useLazyQuery } from '@apollo/client';
 import ChampionRow, { Champion } from './ChampionRow';
 
 const GET_ALL_CHAMPS = gql`
-    query getAllChamps { # this line is optional
+    query getAllChamps {
+        # this line is optional
         champions {
             id
             name
@@ -33,7 +34,6 @@ const QUERY_A_CHAMPION = gql`
     }
 `;
 
-
 const QUERY_CHAMP_BY_ID_NAME = gql`
     query GetChampByIdOrName($id: ID, $name: String) {
         champIdOrName(filters: { id: $id, name: $name }) {
@@ -43,7 +43,7 @@ const QUERY_CHAMP_BY_ID_NAME = gql`
             isMeta
         }
     }
-`
+`;
 
 const Champions = () => {
     const initialValue: any = '';
@@ -52,7 +52,7 @@ const Champions = () => {
     const [champIdOrNameInput, setChampIdOrNameInput] = useState<string>('');
 
     const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
-    
+
     const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(
         QUERY_A_CHAMPION,
         {
@@ -63,10 +63,9 @@ const Champions = () => {
     const [fetchChampByIdName, { data: champIdNameData }] = useLazyQuery(QUERY_CHAMP_BY_ID_NAME);
 
     const performSearch = async () => {
-        
         // method 1: passing the options object into the returned fetch function, with id as variable
         // await fetchChampion({
-        //     variables: { 
+        //     variables: {
         //         id: searchedChampRef.current.value
         //     }
         // });
@@ -89,8 +88,8 @@ const Champions = () => {
     const searchByNameHandler = async () => {
         await fetchChampByIdName({
             variables: {
-                name: champIdOrNameInput
                 // id: typeof parseInt(champIdOrNameInput) === 'number' ? champIdOrNameInput : null,
+                name: champIdOrNameInput,
             }
         });
     };
@@ -127,7 +126,7 @@ const Champions = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {champData.champions.map((champion: Champion) => (
+                    {champData?.champions?.map((champion: Champion) => (
                         <ChampionRow key={champion.id} champion={champion} />
                     ))}
                 </tbody>
@@ -156,13 +155,13 @@ const Champions = () => {
             ) : (
                 <p>No champion found</p>
             )}
+
             <h2>Search for a champion by Name</h2>
             <input
                 type="text"
                 onChange={(e) => setChampIdOrNameInput(e.currentTarget.value)}
                 onKeyDown={searchByNameHandler}
             />
-
             <button onClick={searchByNameHandler}>Search by Name</button>
             <p>Id: {champIdNameData && champIdNameData.champIdOrName?.id}</p>
             <p>Name: {champIdNameData && champIdNameData.champIdOrName?.name}</p>

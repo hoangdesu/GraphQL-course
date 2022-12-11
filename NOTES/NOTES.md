@@ -340,5 +340,156 @@ module.exports = { resolvers };
     return null;
   }
   ```
-# 6. UseQuery Hook in Apollo Client
-// TODO: ep6
+# 6. useQuery Hook in Apollo Client
+
+### Set up frontend client 
+
+- setup with React (Vite) using Apollo Client 3
+- install 2 packages: `npm install graphql @apollo/client`
+- the `ApolloClient` class: create an client instance with options `uri` and `cache`. Can instantiate in either `index.js` or `App.jsx`:
+  ```
+  import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
+
+  const client = new ApolloClient({
+    uri: 'http://localhost:4000', // apollo server endpoint
+    cache: new InMemoryCache()
+  })
+  ```
+- The `ApolloProvider` component: uses React's Context API to make client instance available throughout a React app. To use it, we wrap our app's top level component (e.g. `<App />`) in `ApolloProvider` component and pass `client` instance as prop:
+  ```
+   <ApolloProvider client={client}>
+      <div className="App">
+        <Champions />
+        <Maps />
+      </div>
+  </ApolloProvider>
+  ```
+
+### Using query hooks
+- import `gql` template literal
+- defining a query: query constant by convention is in all CAP; wrap query statement inside `gql`, similar to defining schema. An example query **without** param:
+  ```
+  const GET_ALL_CHAMPS = gql`
+      query getAllChamps {  # <- (1)
+          champions {       # <- (2)
+              id            # <- (3) 
+              name
+              isMeta
+              roles
+          }
+      }
+  `;
+
+  // NOTES
+  * (1): query name (and even the query keyword) is optional and doesn't matter
+  * (2): will need to access this field with exact same name in returned data (e.g. data.champions)
+  * (3): specify the fields we want to get back
+  ```
+
+#### `useQuery` hook:
+- returns an object; 3 most common fields that can be destructured and used: `data`, `loading` & `error`
+- structure: 
+  ```
+  const { data, loading, error } = useQuery(QUERY_STATEMENT, options);
+
+  // e.g.
+  const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
+  ```
+- can rename fields if there're multiple queries: `{ data: champData }`
+- can use states `loading` or `error` to return different views
+- 2nd param in the useQuery hook is to specify options, such as passing query input with `variables` 
+
+#### `useLazyQuery` hook:
+- similar to `useQuery` hook, but suitable for using when an event is triggered (e.g. button onClick); whereas `useQuery` is called whenever the function component gets executed
+- returns an array: 1st item is a **callback function** to perform the query; 2nd item is an object that contains **`data`**, similar to `useQuery`:
+  ```
+  const [callbackFunction, { data, loading, error }] = useLazyQuery(QUERY_STATEMENT);
+  ```
+
+#### Passing query inputs `variables`:
+
+<ins>Query with 1 argument:</ins>
+- in query definition: pass param from the query name with a dollar sign (`$`); forward it as the query's argument
+- **NOTE:** ensure param data type matches the type-defs; otherwise will cause error 400!
+- an example query with only 1 argument:
+  ```
+  const QUERY_A_CHAMPION = gql`
+    query GetChampByID($id: ID!) {
+        champion(id: $id) {
+            id
+            name
+            roles
+            isMeta
+            # strongAgainst # this field ALONE will cause error, cuz it needs to know the fields inside needed for query!!!
+            strongAgainst {
+                id
+                name
+                roles
+                isMeta
+            }
+            game
+            abilities
+        }
+    }
+  `;
+  ```
+
+2 ways to use the argument in hooks:
+- **Method 1 - pass into query hook**: pass into 2nd param inside hook (param) in `variables` field:
+  ```
+  const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(
+      QUERY_A_CHAMPION,
+      {
+          variables: { id: searchedChampRef.current.value } // get from user input
+      }
+  );
+  ```
+- **Method 2 - pass into callback function**: pass an object with field `variables` as param inside callback function when call:
+  ```
+  fetchChampion({ 
+    variables: { id: searchedChampRef.current.value } // get from user input
+  });
+  ```
+- NOTE: method 2 (in callback function) will overwrite method 1 (in query hook) if 2 `variables` objects co-exist
+
+<ins>Query with multiple arguments:</ins>
+
+- similar to 1 argument, but separate arguments with commas
+- no `input`, so combine all arguments as a single object
+  ```
+  const QUERY_CHAMP_BY_ID_NAME = gql`
+    query GetChampByIdOrName($id: ID, $name: String) {
+        champIdOrName(filters: { id: $id, name: $name }) {  # <- (*)
+            name
+            id
+            roles
+            isMeta
+        }
+    }
+  `;
+
+  (*): pay attention to the directions of the $ signs (references)
+  ```
+- passing argument into callback function (or similar with passing into query hook):
+  ```
+  const searchByNameHandler = async () => {
+    await fetchChampByIdName({
+        variables: {
+            name: champIdOrNameInput
+            id: typeof parseInt(champIdOrNameInput) === 'number' ? champIdOrNameInput : null,
+        }
+    });
+  };
+  ```
+
+#### Using returned query data
+
+- returned query data will be available under field with the **same name inside query** (e.g. `champions`). Make sure to access this field first before getting the data needed
+- make sure to **check for data availability** first before using; otherwise could cause error when rendering UI. Example:
+  ```
+  // using optional
+  <p>Name: {searchedChampData?.champion?.name}</p>
+
+  // using && operator
+  <p>Id: {champIdNameData && champIdNameData.champIdOrName?.id}</p>
+  ```
