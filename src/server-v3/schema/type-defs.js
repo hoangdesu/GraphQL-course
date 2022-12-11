@@ -6,7 +6,7 @@ const typeDefs = gql`
         name: String!
         roles: [Role!]
         isMeta: Boolean!
-        strongAgainst: [Champion!]
+        strongAgainst: [Champion]
         game: String!
         abilities: [String!]!
         whatever: String

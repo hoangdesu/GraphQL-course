@@ -32,7 +32,8 @@ const resolvers = {
                 // same as above
                 return favoriteChamps.find(champ => champ.id === parseInt(id)); 
             } else if (name) {
-                return favoriteChamps.find(champ => champ.name === name);
+                // ignore cases
+                return favoriteChamps.find(champ => champ.name.toLowerCase() === name.toLowerCase());
             }
             
             return null;

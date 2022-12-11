@@ -31,19 +31,36 @@ const QUERY_A_CHAMPION = gql`
             abilities
         }
     }
+`;
+
+
+const QUERY_CHAMP_BY_ID_NAME = gql`
+    query GetChampByIdOrName($id: ID, $name: String) {
+        champIdOrName(filters: { id: $id, name: $name }) {
+            name
+            id
+            roles
+            isMeta
+        }
+    }
 `
 
 const Champions = () => {
     const initialValue: any = '';
     const searchedChampRef = useRef(initialValue);
 
+    const [champIdOrNameInput, setChampIdOrNameInput] = useState<string>('');
+
     const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
     
-    const [fetchChampion, { data: searchedChampData, error: searchedError }] =
-        useLazyQuery(QUERY_A_CHAMPION, {
+    const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(
+        QUERY_A_CHAMPION,
+        {
             variables: { id: searchedChampRef.current.value }
-        });
+        }
+    );
 
+    const [fetchChampByIdName, { data: champIdNameData }] = useLazyQuery(QUERY_CHAMP_BY_ID_NAME);
 
     const performSearch = async () => {
         
@@ -69,6 +86,15 @@ const Champions = () => {
         }
     };
 
+    const searchByNameHandler = async () => {
+        await fetchChampByIdName({
+            variables: {
+                name: champIdOrNameInput
+                // id: typeof parseInt(champIdOrNameInput) === 'number' ? champIdOrNameInput : null,
+            }
+        });
+    };
+
     const searchButtonClickHandler = (e: MouseEvent<HTMLButtonElement>) => {
         performSearch();
     };
@@ -86,6 +112,7 @@ const Champions = () => {
     }
 
     console.log('searched champ data:', searchedChampData);
+    console.log('searched by id or name:', champIdNameData);
 
     return (
         <div>
@@ -105,11 +132,14 @@ const Champions = () => {
                     ))}
                 </tbody>
             </table>
-
-            <h2>Search for a champion</h2>
-            <input type="text" ref={searchedChampRef} onKeyDown={searchInputEnterHandler} />
+            <h2>Search for a champion by ID</h2>
+            <input
+                type="text"
+                ref={searchedChampRef}
+                placeholder="Champion ID"
+                onKeyDown={searchInputEnterHandler}
+            />
             <button onClick={searchButtonClickHandler}>Search</button>
-
             {searchedChampData?.champion ? (
                 <div>
                     <p>ID: {searchedChampData?.champion.id}</p>
@@ -126,6 +156,18 @@ const Champions = () => {
             ) : (
                 <p>No champion found</p>
             )}
+            <h2>Search for a champion by Name</h2>
+            <input
+                type="text"
+                onChange={(e) => setChampIdOrNameInput(e.currentTarget.value)}
+                onKeyDown={searchByNameHandler}
+            />
+
+            <button onClick={searchByNameHandler}>Search by Name</button>
+            <p>Id: {champIdNameData && champIdNameData.champIdOrName?.id}</p>
+            <p>Name: {champIdNameData && champIdNameData.champIdOrName?.name}</p>
+            <p>Roles: {champIdNameData && champIdNameData.champIdOrName?.roles.join(' - ')}</p>
+            <p>Meta: {champIdNameData && champIdNameData.champIdOrName?.isMeta.toString()}</p>
         </div>
     );
 };
