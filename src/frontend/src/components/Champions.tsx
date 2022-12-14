@@ -182,7 +182,7 @@ const Champions = () => {
                 <tbody>
                     {/* FETCH ALL CHAMPS DATA - USEQUERY */}
                     {champData?.champions?.map((champion: Champion) => (
-                        <ChampionRow key={champion.id} champion={champion} />
+                        <ChampionRow key={champion.id} champion={champion} refetch={refetchAllChamps} />
                     ))}
 
                     {/* ADD NEW CHAMP - USEMUTATION */}
@@ -256,7 +256,7 @@ const Champions = () => {
                     )}
                 </tbody>
             </table>
-            <button onClick={toggleAddNewChampBtn}>Add new champ</button>
+            <button onClick={toggleAddNewChampBtn}>➕ Add new champ</button>
             <h2>Search for a champion by ID</h2>
             <input type="text" ref={searchedChampRef} placeholder="Champion ID" onKeyDown={searchInputEnterHandler} />
             <button onClick={searchButtonClickHandler}>Search</button>

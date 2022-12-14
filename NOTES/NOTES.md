@@ -499,3 +499,5 @@ Good references:
 - https://www.apollographql.com/tutorials/lift-off-part3/the-usequery-hook---with-variables
 - https://www.apollographql.com/docs/react/data/queries/
 - https://stackoverflow.com/questions/65610843/react-apollo-client-query-with-input-variables
+
+# 7. useMutation hook
