@@ -74,7 +74,7 @@ const resolvers = {
             return champ;
         },
 
-        updateChampion(_parent, args) {
+        renameChampion(_parent, args) {
             console.log('arg inputs:');
             console.log(args.id);
             console.log(args.name);
@@ -96,6 +96,36 @@ const resolvers = {
                 }
             }
             console.log('no champ removed');
+            return null;
+        },
+
+        updateChampion: (parent, args) => {
+            console.log('args.input:', args.input);
+            for (const [i, champ] of favoriteChamps.entries()) {
+                if (champ.id === parseInt(args.input.id)) {
+                    // if (args.input.name) {
+                    //     favoriteChamps[i].name = args.input.name;
+                    // }
+
+                    // if (args.roles) {
+                    //     favoriteChamps[i].roles = args.input.roles;
+                    // }
+
+                    // if (args.isMeta) {
+                    //     favoriteChamps[i].isMeta = args.input.isMeta;
+                    // }
+
+                    favoriteChamps[i] = {
+                        ...favoriteChamps[i],
+                        name: args.input.name,
+                        roles: args.input.roles,
+                        isMeta: args.input.isMeta
+                    }
+
+                    console.log('UPDATE CHAMP:', favoriteChamps[i]);
+                    return favoriteChamps[i];
+                }
+            }
             return null;
         }
     }

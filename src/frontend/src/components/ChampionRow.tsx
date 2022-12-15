@@ -14,10 +14,20 @@ interface ChampionRowProps {
 }
 
 const REMOVE_CHAMP_MUTATION = gql`
-    mutation removeChamp($id: ID!) {
+    mutation RemoveChamp($id: ID!) {
         removeChampion(id: $id) {
             name
             id
+        }
+    }
+`;
+
+const UPDATE_CHAMP_MUTATION = gql`
+    mutation UpdateChampion($input: updateChampionInput!) {
+        updateChampion(input: $input) {
+            name
+            roles
+            isMeta
         }
     }
 `;
@@ -27,17 +37,33 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
     const [champ, setChamp] = useState<Champion>(champion);
 
     // useMutation
-    const [removeChampMutation, { data } ] = useMutation(REMOVE_CHAMP_MUTATION);
+    const [removeChampMutation, { data }] = useMutation(REMOVE_CHAMP_MUTATION);
+    const [updateChampMutation, {}] = useMutation(UPDATE_CHAMP_MUTATION, {
+        variables: {
+            input: {
+                id: champ.id,
+                name: champ.name,
+                roles: champ.roles,
+                isMeta: champ.isMeta
+            }
+        }
+    });
 
     let roleStr = '';
-
     champ.roles.forEach((role, index) => {
         roleStr += role.charAt(0).toLocaleUpperCase() + role.slice(1).toLowerCase(); // JS capitalize first letter 🥴
         if (index < champ.roles.length - 1) roleStr += ' / ';
     });
 
-    const toggleShowEditor = () => {
-        setShowEditor(!showEditor);
+    const toggleShowEditor = async () => {
+        if (showEditor) {
+            if (confirm(`Save changes?`)) {
+                await updateChampMutation();
+                alert('Champions updated successfully');
+            }
+        }
+        await setShowEditor(!showEditor);
+        await refetch();
     };
 
     const removeChampHandler = () => {
@@ -73,10 +99,31 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
                         />
                     </td>
                     <td>
-                        <input type="" />
+                        {/* too many handlings :)) */}
+                        {/* {champ.roles.map((role, i) => (
+                          <select name="" id="" >
+                            <option value="TOP" selected={role === champ.roles[i]}>Top</option>
+                            <option value="JUNGLE" selected={role === champ.roles[i]}>Jungle</option>
+                            <option value="MID" selected={role === champ.roles[i]}>Mid</option>
+                            <option value="ADC" selected={role === champ.roles[i]}>ADC</option>
+                            <option value="SUPPORT" selected={role === champ.roles[i]}>Support</option>
+                          </select>
+                        ))} */}
+                        <input
+                            type="text"
+                            value={champ.roles.join(', ')}
+                            onChange={(e) => {
+                                setChamp((prev) => ({
+                                    ...prev,
+                                    roles: [e.target.value.toUpperCase()]
+                                }));
+                            }}
+                        />
                     </td>
                     <td>
-                        <input type="checkbox" />
+                        <input type="checkbox" defaultChecked={champ.isMeta} onChange={e => {
+                          setChamp({ ...champ, isMeta: e.target.checked })
+                        }} />
                     </td>
                 </>
             ) : (

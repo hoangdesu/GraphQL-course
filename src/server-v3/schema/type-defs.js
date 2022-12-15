@@ -50,10 +50,18 @@ const typeDefs = gql`
         isMeta: Boolean = false # default value
     }
 
+    input updateChampionInput {
+        id: ID!
+        name: String
+        roles: [Role]
+        isMeta: Boolean
+    }
+
     type Mutation {
         addChampion(input: addChampionInput!): Champion!
-        updateChampion(id: ID!, name: String!, newName: String!): Champion
+        renameChampion(id: ID!, name: String!, newName: String!): Champion
         removeChampion(id: ID!): Champion
+        updateChampion(input: updateChampionInput!): Champion
     }
 
 `
