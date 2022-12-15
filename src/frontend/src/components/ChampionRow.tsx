@@ -100,16 +100,25 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
                     </td>
                     <td>
                         {/* too many handlings :)) */}
-                        {/* {champ.roles.map((role, i) => (
-                          <select name="" id="" >
-                            <option value="TOP" selected={role === champ.roles[i]}>Top</option>
-                            <option value="JUNGLE" selected={role === champ.roles[i]}>Jungle</option>
-                            <option value="MID" selected={role === champ.roles[i]}>Mid</option>
-                            <option value="ADC" selected={role === champ.roles[i]}>ADC</option>
-                            <option value="SUPPORT" selected={role === champ.roles[i]}>Support</option>
+                        {champ.roles.map((role, i) => (
+                          <select onChange={e => {
+                            const newRoles = [...champ.roles];
+                            newRoles[i] = e.target.value;
+                            setChamp(prev => {
+                              return {
+                                ...prev,
+                                roles: newRoles
+                              }
+                            }) 
+                          }} >
+                            <option value="TOP" selected={role === 'TOP'}>Top</option>
+                            <option value="JUNGLE" selected={role === 'JUNGLE'}>Jungle</option>
+                            <option value="MID" selected={role === 'MID'}>Mid</option>
+                            <option value="ADC" selected={role === 'ADC'}>ADC</option>
+                            <option value="SUPPORT" selected={role === 'SUPPORT'}>Support</option>
                           </select>
-                        ))} */}
-                        <input
+                        ))}
+                        {/* <input
                             type="text"
                             value={champ.roles.join(', ')}
                             onChange={(e) => {
@@ -118,7 +127,7 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
                                     roles: [e.target.value.toUpperCase()]
                                 }));
                             }}
-                        />
+                        /> */}
                     </td>
                     <td>
                         <input type="checkbox" defaultChecked={champ.isMeta} onChange={e => {

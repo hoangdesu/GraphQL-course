@@ -47,7 +47,8 @@ const QUERY_CHAMP_BY_ID_NAME = gql`
 `;
 
 const CREATE_NEW_CHAMP = gql`
-    mutation CreateNewChamp($input: addChampionInput!) { # only need to specify the input matching the one defined in type-defs. No need to redefine
+    mutation CreateNewChamp($input: addChampionInput!) {
+        # only need to specify the input matching the one defined in type-defs. No need to redefine
         addChampion(input: $input) {
             id
             name
@@ -64,7 +65,7 @@ const Champions = () => {
     const [champIdOrNameInput, setChampIdOrNameInput] = useState<string>('');
 
     const [showNewRow, setShowNewRow] = useState<boolean>(false);
-    
+
     const [newChamp, setNewChamp] = useState<Champion>({
         id: 0,
         name: '',
@@ -73,20 +74,20 @@ const Champions = () => {
     });
 
     // QUERIES
-    const { data: champData, loading: champLoading, error: champError, refetch: refetchAllChamps } = useQuery(GET_ALL_CHAMPS);
+    const {
+        data: champData,
+        loading: champLoading,
+        error: champError,
+        refetch: refetchAllChamps
+    } = useQuery(GET_ALL_CHAMPS);
 
-    const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(
-        QUERY_A_CHAMPION,
-        {
-            variables: { id: searchedChampRef.current.value }
-        }
-    );
+    const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(QUERY_A_CHAMPION, {
+        variables: { id: searchedChampRef.current.value }
+    });
 
     const [fetchChampByIdName, { data: champIdNameData }] = useLazyQuery(QUERY_CHAMP_BY_ID_NAME);
 
     const [addNewChampMutation] = useMutation(CREATE_NEW_CHAMP);
-        
-
 
     // UTIL FUNCTIONS
     const performSearch = async () => {
@@ -140,31 +141,40 @@ const Champions = () => {
     console.log('searched champ data:', searchedChampData);
     console.log('searched by id or name:', champIdNameData);
 
-    
     // ADD NEW CHAMP FUNCTIONS - USEMUTATION
     const addNewChamp = async () => {
-        // send the mutation, matching the input definition "addChampionInput" from type-defs
-        await addNewChampMutation({ variables: {
-            input: {
-                name: newChamp.name,
-                roles: newChamp.roles,
-                isMeta: newChamp.isMeta
-            }
-        }});
+        if (!newChamp.name) {
+            alert('Champion name empty');
+            return;
+        }
 
-        //  update UI without having to reload the whole page 
+        // send the mutation, matching the input definition "addChampionInput" from type-defs
+        await addNewChampMutation({
+            variables: {
+                input: {
+                    name: newChamp.name,
+                    roles: newChamp.roles,
+                    isMeta: newChamp.isMeta
+                }
+            }
+        });
+
+        //  update UI without having to reload the whole page
         await refetchAllChamps();
         await setShowNewRow(false);
-    }
+        setNewChamp({ id: 0, name: '', roles: [], isMeta: false });
+        alert(`Added ${newChamp.name} successfully.`);
+    };
 
     const toggleAddNewChampBtn = () => {
         setShowNewRow((prevState) => !prevState);
-        
-        setNewChamp(prev => ({
+        const lastIndex = champData?.champions?.length - 1;
+        const newId = parseInt(champData?.champions?.[lastIndex].id) + 1;
+        setNewChamp((prev) => ({
             ...prev,
-            id: champData?.champions?.length + 1,
+            id: newId
         }));
-    }
+    };
 
     return (
         <div>
@@ -196,7 +206,9 @@ const Champions = () => {
                                     onChange={(e) =>
                                         setNewChamp((prev) => ({
                                             ...prev,
-                                            name: e.target.value && (e.target.value[0].toUpperCase() + e.target.value.slice(1))
+                                            name:
+                                                e.target.value &&
+                                                e.target.value[0].toUpperCase() + e.target.value.slice(1)
                                         }))
                                     }
                                 />
@@ -206,17 +218,21 @@ const Champions = () => {
                                 <label htmlFor="primaryRole">Primary role: </label>
                                 <select
                                     id="primaryRole"
-                                    onChange={(e) =>
-                                        setNewChamp((prev) => ({
-                                            ...prev,
-                                            roles: [e.target.value]
-                                        }))
-                                    }
+                                    onChange={(e) => {
+                                        setNewChamp((prev) => {
+                                            const roles = [...prev.roles];
+                                            roles[0] = e.target.value;
+                                            return {
+                                                ...prev,
+                                                roles
+                                            };
+                                        });
+                                    }}
                                 >
-                                    <option value="TOP">Top</option>
+                                    <option value="TOP" selected>Top</option>
                                     <option value="JUNGLE">Jungle</option>
                                     <option value="MID">Mid</option>
-                                    <option value="ADC">ADC</option>
+                                    <option value="ADC" >ADC</option>
                                     <option value="SUPPORT">Support</option>
                                 </select>
                                 <br />
@@ -225,7 +241,7 @@ const Champions = () => {
                                     id="secondaryRole"
                                     onChange={(e) =>
                                         setNewChamp((prev) => {
-                                            let roles = [...prev.roles];
+                                            const roles = [...prev.roles];
                                             if (e.target.value !== 'none') roles[1] = e.target.value;
                                             return {
                                                 ...prev,
@@ -235,7 +251,9 @@ const Champions = () => {
                                     }
                                 >
                                     <option value="TOP">Top</option>
-                                    <option value="JUNGLE">Jungle</option>
+                                    <option value="JUNGLE" selected>
+                                        Jungle
+                                    </option>
                                     <option value="MID">Mid</option>
                                     <option value="ADC">ADC</option>
                                     <option value="SUPPORT">Support</option>
@@ -243,20 +261,24 @@ const Champions = () => {
                                 </select>
                             </td>
                             <td>
-                                <input type="checkbox" onChange={e => setNewChamp(prev => ({
-                                    ...prev,
-                                    isMeta: e.target.checked
-                                }))} />
-                                {/* <input type="checkbox" onChange={e=>console.log(e.target.checked)}/> */}
+                                <input
+                                    type="checkbox"
+                                    onChange={(e) =>
+                                        setNewChamp((prev) => ({
+                                            ...prev,
+                                            isMeta: e.target.checked
+                                        }))
+                                    }
+                                />
                             </td>
                             <td>
-                                <button onClick={() => addNewChamp()}>➕</button>
+                                <button onClick={addNewChamp}>➕ Add</button>
                             </td>
                         </tr>
                     )}
                 </tbody>
             </table>
-            <button onClick={toggleAddNewChampBtn}>➕ Add new champ</button>
+            <button onClick={toggleAddNewChampBtn}>{!showNewRow ? '➕ Add new champ' : 'Cancel'}</button>
             <h2>Search for a champion by ID</h2>
             <input type="text" ref={searchedChampRef} placeholder="Champion ID" onKeyDown={searchInputEnterHandler} />
             <button onClick={searchButtonClickHandler}>Search</button>
