@@ -37,8 +37,8 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
     const [champ, setChamp] = useState<Champion>(champion);
 
     // useMutation
-    const [removeChampMutation, { data }] = useMutation(REMOVE_CHAMP_MUTATION);
-    const [updateChampMutation, {}] = useMutation(UPDATE_CHAMP_MUTATION, {
+    const [removeChampMutation, { data: removedChampData }] = useMutation(REMOVE_CHAMP_MUTATION);
+    const [updateChampMutation, { data: updatedChampData }] = useMutation(UPDATE_CHAMP_MUTATION, {
         variables: {
             input: {
                 id: champ.id,
@@ -59,22 +59,25 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
         if (showEditor) {
             if (confirm(`Save changes?`)) {
                 await updateChampMutation();
-                alert('Champions updated successfully');
+                
+                // alert('Champions updated successfully');
+              console.log('updated:', updatedChampData);
+              
+
             }
         }
         await setShowEditor(!showEditor);
         await refetch();
     };
 
-    const removeChampHandler = () => {
+    const removeChampHandler = async () => {
         const removeConfirmed = confirm(`Are you sure you want to remove ${champ.name}?`);
         if (removeConfirmed) {
-            removeChampMutation({
+            await removeChampMutation({
                 variables: {
                     id: Number(champ.id)
                 }
             });
-
             refetch();
         }
     };
@@ -100,8 +103,8 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
                     </td>
                     <td>
                         {/* too many handlings :)) */}
-                        {champ.roles.map((role, i) => (
-                          <select onChange={e => {
+                        {[1,2].map((num, i) => (
+                          <select key={num} onChange={e => {
                             const newRoles = [...champ.roles];
                             newRoles[i] = e.target.value;
                             setChamp(prev => {
@@ -111,11 +114,11 @@ const ChampionRow: FunctionComponent<ChampionRowProps> = ({ champion, refetch })
                               }
                             }) 
                           }} >
-                            <option value="TOP" selected={role === 'TOP'}>Top</option>
-                            <option value="JUNGLE" selected={role === 'JUNGLE'}>Jungle</option>
-                            <option value="MID" selected={role === 'MID'}>Mid</option>
-                            <option value="ADC" selected={role === 'ADC'}>ADC</option>
-                            <option value="SUPPORT" selected={role === 'SUPPORT'}>Support</option>
+                            <option value="TOP" selected={champ.roles[i] === 'TOP'}>Top</option>
+                            <option value="JUNGLE" selected={champ.roles[i] === 'JUNGLE'}>Jungle</option>
+                            <option value="MID" selected={champ.roles[i] === 'MID'}>Mid</option>
+                            <option value="ADC" selected={champ.roles[i] === 'ADC'}>ADC</option>
+                            <option value="SUPPORT" selected={champ.roles[i] === 'SUPPORT'}>Support</option>
                           </select>
                         ))}
                         {/* <input
