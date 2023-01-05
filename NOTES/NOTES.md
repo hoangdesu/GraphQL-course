@@ -273,15 +273,16 @@ module.exports = { resolvers };
 - versus HTTP: `query` = `GET` request; `mutation` = `POST`, `PUT`, `DELETE`
 - > technically, any query could be implemented to cause a data write. However, it's useful to establish a convention that any operations that cause writes should be sent explicitly via a mutation.
 - mutation's fields should be verbs e.g. `createUser`
-- common convention: whenever we modify a type, just return that type 
+- common convention: whenever we modify a type, just return that type
 - (-> because GQL uses a lot of caching, we have to return itself to ensure it is the latest state possible)
 - use `input` to group arguments
 - similar to query using positional arguments, can pass data from `Variables` tab and access argument input from `args.input`
 - **type-defs.js:**
+
   ```
   input addChampionInput {
     name: String!
-    roles: [Role!] = [MID] # 
+    roles: [Role!] = [MID] #
     isMeta: Boolean = false # default value
   }
 
@@ -290,6 +291,7 @@ module.exports = { resolvers };
   }
 
   ```
+
 - **resolvers.js:**
   ```
     Mutation: {
@@ -299,7 +301,7 @@ module.exports = { resolvers };
           const champ = {
               ...args.input,
               id: newId
-          } 
+          }
           console.log(champ);
           favoriteChamps.push(champ);
           return champ;
@@ -324,7 +326,7 @@ module.exports = { resolvers };
         }
     }
     return null;
-  } 
+  }
   ```
 - **Remove champion resolver:**
   ```
@@ -340,13 +342,15 @@ module.exports = { resolvers };
     return null;
   }
   ```
+
 # 6. useQuery Hook in Apollo Client
 
-### Set up frontend client 
+### Set up frontend client
 
 - setup with React (Vite) using Apollo Client 3
 - install 2 packages: `npm install graphql @apollo/client`
 - the `ApolloClient` class: create an client instance with options `uri` and `cache`. Can instantiate in either `index.js` or `App.jsx`:
+
   ```
   import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 
@@ -355,6 +359,7 @@ module.exports = { resolvers };
     cache: new InMemoryCache()
   })
   ```
+
 - The `ApolloProvider` component: uses React's Context API to make client instance available throughout a React app. To use it, we wrap our app's top level component (e.g. `<App />`) in `ApolloProvider` component and pass `client` instance as prop:
   ```
    <ApolloProvider client={client}>
@@ -366,13 +371,15 @@ module.exports = { resolvers };
   ```
 
 ### Using query hooks
+
 - import `gql` template literal
 - defining a query: query constant by convention is in all CAP; wrap query statement inside `gql`, similar to defining schema. An example query **without** param:
+
   ```
   const GET_ALL_CHAMPS = gql`
       query getAllChamps {  # <- (1)
           champions {       # <- (2)
-              id            # <- (3) 
+              id            # <- (3)
               name
               isMeta
               roles
@@ -387,19 +394,23 @@ module.exports = { resolvers };
   ```
 
 #### `useQuery` hook:
+
 - returns an object; 3 most common fields that can be destructured and used: `data`, `loading` & `error`
-- structure: 
+- structure:
+
   ```
   const { data, loading, error } = useQuery(QUERY_STATEMENT, options);
 
   // e.g.
   const { data: champData, loading: champLoading, error: champError } = useQuery(GET_ALL_CHAMPS);
   ```
+
 - can rename fields if there're multiple queries: `{ data: champData }`
 - can use states `loading` or `error` to return different views
-- 2nd param in the useQuery hook is to specify options, such as passing query input with `variables` 
+- 2nd param in the useQuery hook is to specify options, such as passing query input with `variables`
 
 #### `useLazyQuery` hook:
+
 - similar to `useQuery` hook, but suitable for using when an event is triggered (e.g. button onClick); whereas `useQuery` is called whenever the function component gets executed
 - returns an array: 1st item is a **callback function** to perform the query; 2nd item is an object that contains **`data`**, similar to `useQuery`:
   ```
@@ -409,6 +420,7 @@ module.exports = { resolvers };
 #### Passing query inputs `variables`:
 
 <ins>Query with 1 argument:</ins>
+
 - in query definition: pass param from the query name with a dollar sign (`$`); forward it as the query's argument
 - **NOTE:** ensure param data type matches the type-defs; otherwise will cause error 400!
 - an example query with only 1 argument:
@@ -435,6 +447,7 @@ module.exports = { resolvers };
   ```
 
 2 ways to use the argument in hooks:
+
 - **Method 1 - pass into query hook**: pass into 2nd param inside hook (param) in `variables` field:
   ```
   const [fetchChampion, { data: searchedChampData, error: searchedError }] = useLazyQuery(
@@ -446,7 +459,7 @@ module.exports = { resolvers };
   ```
 - **Method 2 - pass into callback function**: pass an object with field `variables` as param inside callback function when call:
   ```
-  fetchChampion({ 
+  fetchChampion({
     variables: { id: searchedChampRef.current.value } // get from user input
   });
   ```
@@ -456,6 +469,7 @@ module.exports = { resolvers };
 
 - similar to 1 argument, but separate arguments with commas
 - no `input`, so combine all arguments as a single object
+
   ```
   const QUERY_CHAMP_BY_ID_NAME = gql`
     query GetChampByIdOrName($id: ID, $name: String) {
@@ -470,6 +484,7 @@ module.exports = { resolvers };
 
   (*): pay attention to the directions of the $ signs (references)
   ```
+
 - passing argument into callback function (or similar with passing into query hook):
   ```
   const searchByNameHandler = async () => {
@@ -486,6 +501,7 @@ module.exports = { resolvers };
 
 - returned query data will be available under field with the **same name inside query** (e.g. `champions`). Make sure to access this field first before getting the data needed
 - make sure to **check for data availability** first before using; otherwise could cause error when rendering UI. Example:
+
   ```
   // using optional
   <p>Name: {searchedChampData?.champion?.name}</p>
@@ -495,9 +511,85 @@ module.exports = { resolvers };
   ```
 
 Good references:
+
 - https://www.apollographql.com/tutorials/lift-off-part1/the-usequery-hook
 - https://www.apollographql.com/tutorials/lift-off-part3/the-usequery-hook---with-variables
 - https://www.apollographql.com/docs/react/data/queries/
 - https://stackoverflow.com/questions/65610843/react-apollo-client-query-with-input-variables
 
 # 7. useMutation hook
+
+#### Usage:
+
+Similar to `useQuery` hook, which is used to get the data via GET request, `useMutation` hook is used to **modify** data as PUT, POST, DELETE, PATCH requests.
+
+- similar usage to `useQuery`:
+  1. import `gql` and `useMutation` from `@apollo/client`
+  2. define mutation with gql template literal
+  3. call `useMutation` hook with mutation defined above
+
+#### Define mutation:
+```
+const CREATE_NEW_CHAMP = gql`
+    mutation CreateNewChamp($input: addChampionInput!) {
+        # only need to specify the input matching the one defined in type-defs. No need to redefine
+        addChampion(input: $input) {
+            id
+            name
+            roles
+        }
+    }
+`;
+```
+
+#### Returned values:
+
+`useMutation` returns a tuple that includes:
+
+- A **mutate function** that you can call at any time to execute the mutation
+- An **object** with fields that represent the current status of the mutation's execution (data, loading, etc.). Similar to the object returned by `useQuery` hook. See object details at: https://www.apollographql.com/docs/react/data/mutations/#result
+  - ```
+    const [removeChampMutation, { data: removedChampData }] = useMutation(REMOVE_CHAMP_MUTATION);
+    ```
+
+#### Providing options:
+
+2 ways to provide options to a mutation via the `variables` option:
+
+- from `useMutation` hook: provide options object as its second parameter
+  - ```
+    const [updateChampMutation, { data: updatedChampData }] = useMutation(UPDATE_CHAMP_MUTATION, {
+      variables: {
+          input: {
+              id: champ.id,
+              name: champ.name,
+              roles: champ.roles,
+              isMeta: champ.isMeta
+          }
+      }
+    });
+    ```
+- from mutate function: pass options as an object to where the mutate function is called
+  - ```
+    removeChampMutation({
+        variables: {
+            id: Number(champ.id)
+        }
+    });
+    ```
+
+#### Refetching data:
+
+In case UI needs to be updated after executing a query, it can be done in 2 ways:
+
+- execute the `refetch` function from `useQuery`'s returned object', bind to specific query
+- include a `refetchQueries` array in the mutation options, either in the hook or in the mutate function
+  - ```
+    // Refetches two queries after mutation completes
+    const [addTodo, { data, loading, error }] = useMutation(ADD_TODO, {
+      refetchQueries: [
+        {query: GET_POST},  // can either use: DocumentNode object parsed with gql
+        'GetComments'       // or use: Query name
+      ],
+    });
+    ```
