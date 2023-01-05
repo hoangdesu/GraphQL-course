@@ -156,11 +156,15 @@ const Champions = () => {
                     roles: newChamp.roles,
                     isMeta: newChamp.isMeta
                 }
-            }
+            },
+            refetchQueries: [
+                { query: GET_ALL_CHAMPS },   // refetch: either use this way
+                // 'getAllChamps'            // refetch: or this way
+            ]
         });
 
         //  update UI without having to reload the whole page
-        await refetchAllChamps();
+        // await refetchAllChamps();            // refetch: or call the returned refetch function
         await setShowNewRow(false);
         setNewChamp({ id: 0, name: '', roles: [], isMeta: false });
         alert(`Added ${newChamp.name} successfully.`);
