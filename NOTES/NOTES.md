@@ -519,7 +519,7 @@ Good references:
 
 # 7. useMutation hook
 
-#### Usage:
+### Usage:
 
 Similar to `useQuery` hook, which is used to get the data via GET request, `useMutation` hook is used to **modify** data as PUT, POST, DELETE, PATCH requests.
 
@@ -528,7 +528,7 @@ Similar to `useQuery` hook, which is used to get the data via GET request, `useM
   2. define mutation with gql template literal
   3. call `useMutation` hook with mutation defined above
 
-#### Define mutation:
+### Define mutation:
 ```
 const CREATE_NEW_CHAMP = gql`
     mutation CreateNewChamp($input: addChampionInput!) {
@@ -542,7 +542,7 @@ const CREATE_NEW_CHAMP = gql`
 `;
 ```
 
-#### Returned values:
+### Returned values:
 
 `useMutation` returns a tuple that includes:
 
@@ -552,7 +552,7 @@ const CREATE_NEW_CHAMP = gql`
     const [removeChampMutation, { data: removedChampData }] = useMutation(REMOVE_CHAMP_MUTATION);
     ```
 
-#### Providing options:
+### Providing options:
 
 2 ways to provide options to a mutation via the `variables` option:
 
@@ -578,7 +578,7 @@ const CREATE_NEW_CHAMP = gql`
     });
     ```
 
-#### Refetching data:
+### Refetching data:
 
 In case UI needs to be updated after executing a query, it can be done in 2 ways:
 
@@ -593,3 +593,40 @@ In case UI needs to be updated after executing a query, it can be done in 2 ways
       ],
     });
     ```
+
+# 8. Context, Fragments, Union Result Boxes
+
+### Resolver argument
+
+A resolver can optionally accept 4 positional arguments in order: `(parent, args, contextValue, info)`.
+- `parent`: The return value of the resolver for this field's parent (previous resolver in the resolver chain). For resolvers of top-level fields with no parent (such as fields of Query), this value is obtained from the rootValue function passed to Apollo Server's constructor.
+- `args`: Most commonly used field, an object that contains all GQL args provided.
+- `contextValue`: An object **shared across all resolvers** that are executing for a particular operation. Use this to share per-operation state, including authentication information, dataloader instances, and anything else to track across resolvers.
+- `info`: Contains information about the operation's execution state, including the field name, the path to the field from the root, and more.
+
+#### Parent
+- levels: Query (champions) -> Champion (game)
+- ![](20230105173817.png)  
+- parent of top query should be `undefined`. Parent of `game` function should be result of the previous level, which is all the fields from `champions` query
+
+
+#### Context
+- add context when creating a new `ApolloServer` instance as a function returning an object
+- ```
+  const server = new ApolloServer({
+      typeDefs,
+      resolvers,
+      context: () => {
+          return {
+              player: 'Doroke'
+          };
+      }
+  });
+  ```
+- `player: 'Doroke'` becomes available in all resolvers throughout entire app
+- ```
+  hi(parent, args, context) {
+      return `sup ${context.player}`; // sup Doroke
+  },
+  ```
+// TODO: req object

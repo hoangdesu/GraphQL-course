@@ -4,10 +4,11 @@ const _ = require('lodash');
 
 const resolvers = {
     Query: {
-        hi() {
-            return "sup bitch";
+        hi(parent, args, context) {
+            return `sup ${context.player}`; // sup Doroke
         },
-        champions: () => {
+        champions: (parent) => {
+            console.log('parent of champions query (should be undefined):', parent);
             return favoriteChamps;
         },
         champion: (parent, args) => {
@@ -44,7 +45,8 @@ const resolvers = {
     },
 
     Champion: {
-        game: () => {
+        game: (parent) => {
+            console.log('parent of game query:', parent);
             return "League of Legends";
         },
         abilities: () => {
