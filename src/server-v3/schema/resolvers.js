@@ -9,10 +9,12 @@ const resolvers = {
             console.log('Info:', info)
             return `sup ${context.player}`; // sup Doroke
         },
+
         champions: (parent) => {
             console.log('parent of champions query (should be undefined):', parent);
             return favoriteChamps;
         },
+
         champion: (parent, args) => {
             const usingLodash = true;
             if (usingLodash) {
@@ -24,10 +26,12 @@ const resolvers = {
                 return favoriteChamps.find(champ => champ.id === id);
             }
         },
+
         maps: () => {
             const mapsFile = fs.readFileSync(`${__dirname}/maps.json`); // must get current working directory first
             return JSON.parse(mapsFile);
         },
+        
         champIdOrName: (_parent, args) => {
             const { id, name } = args.filters;
             
@@ -41,8 +45,35 @@ const resolvers = {
             
             return null;
         },
+
         hello: (_parent, args) => {
             return `Hello ${args.name}`;
+        },
+
+        // using Union
+        championsWithUnion: () => {
+            const isError = true;
+
+            if (isError) {
+                return { message: 'ERRORRRRRRR' };
+            }
+
+            if (favoriteChamps) return { champions: favoriteChamps };
+        }
+    },
+
+    // using Union
+    ChampionsResult: {
+        __resolveType(obj) {
+            if (obj.champions) {
+                return 'ChampionsResultSuccess';
+            }
+
+            if (obj.message) {
+                return 'ChampionsResultError';
+            }
+
+            return null;
         }
     },
 

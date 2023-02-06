@@ -34,6 +34,7 @@ const typeDefs = gql`
         maps: [Map!]!
         champIdOrName(filters: ChampionInputFilter!): Champion
         hello(name: String!): String!
+        championsWithUnion: ChampionsResult
     }
 
     enum Role {
@@ -63,6 +64,17 @@ const typeDefs = gql`
         removeChampion(id: ID!): Champion
         updateChampion(input: updateChampionInput!): Champion
     }
+    
+    # Error handling with Union
+    type ChampionsResultSuccess {
+        champions: [Champion!]!
+    }
+
+    type ChampionsResultError {
+        message: String!
+    }
+
+    union ChampionsResult = ChampionsResultSuccess | ChampionsResultError
 `
 
 module.exports = { typeDefs };

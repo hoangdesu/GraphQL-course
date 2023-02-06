@@ -596,7 +596,7 @@ In case UI needs to be updated after executing a query, it can be done in 2 ways
 
 # 8. Context, Fragments, Union Result Boxes
 
-### Resolver argument
+## Resolver argument
 
 A resolver can optionally accept 4 positional arguments in order: `(parent, args, contextValue, info)`.
 - `parent`: The return value of the resolver for this field's parent (previous resolver in the resolver chain). For resolvers of top-level fields with no parent (such as fields of Query), this value is obtained from the rootValue function passed to Apollo Server's constructor.
@@ -638,7 +638,7 @@ A resolver can optionally accept 4 positional arguments in order: `(parent, args
 - not many use cases :/
 - can access information about the request, different from the `req` from context
 
-### Fragments
+## Fragments
 
 - a piece of logic that can be shared between multiple queries and mutations
 - used on client side for better code organization
@@ -655,3 +655,6 @@ A resolver can optionally accept 4 positional arguments in order: `(parent, args
     }
   }
   ```
+
+## Error handling with Union
+
