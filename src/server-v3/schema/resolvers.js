@@ -76,15 +76,17 @@ const resolvers = {
     // using Union
     ChampionsResult: {
         __resolveType(obj) {
+
+            // return champion list if the query was successful
             if (obj.champions) {
-                return 'ChampionsResultSuccess';
+                return 'ChampionsResultSuccess'; // return typename as a string
             }
 
             if (obj.message) {
                 return 'ChampionsResultError';
             }
 
-            return null;
+            return null; // GraphQLError is thrown
         }
     },
 

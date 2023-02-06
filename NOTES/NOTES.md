@@ -656,5 +656,356 @@ A resolver can optionally accept 4 positional arguments in order: `(parent, args
   }
   ```
 
-## Error handling with Union
+## Union and error handling
 
+### Union type
+
+- an abstract GraphQL type that enable a schema field to return one of multiple object types
+- all of a union's included types must be object types
+- ```
+    // type-defs.js
+
+    type ChampionsResultSuccess {
+        champions: [Champion!]!
+    }
+
+    type ChampionsResultError {
+        message: String!
+    }
+
+    union ChampionsResult = ChampionsResultSuccess | ChampionsResultError
+
+    type Query {
+      championsWithUnion: ChampionsResult
+    }
+  ```
+- => in this case, `championsWithUnion` query can either return a list of champions if query successfully, or return an error message
+
+### Resolving a union
+
+- to fully resolve a union, Apollo Server needs to specify which of the union's types is being returned
+- to achieve this, you define a `__resolveType` function for the union in your resolver map
+- the function takes in 3 params: `__resolveType(obj, contextValue, info) { ... }`
+- check if a field in `obj` is present, then return the name of that type as a string
+- ```
+  ChampionsResult: {
+    __resolveType(obj) {
+        if (obj.champions) {
+            return 'ChampionsResultSuccess';
+        }
+
+        if (obj.message) {
+            return 'ChampionsResultError';
+        }
+
+        return null; // GraphQLError is thrown
+    }
+  },
+  ```
+
+### Querying a union
+
+- client won't know what object type will be returned when using union. To account for this, a query can include the subfields of **multiple possible types**.
+- ```
+  query ChampionsUnionQuery {
+    championsWithUnion {
+      __typename    # (optional)
+      ... on ChampionsResultSuccess {
+        champions {
+          id
+          name
+        }
+      }
+
+      ... on ChampionsResultError {
+        message
+      }
+    }
+  }
+  ```
+- The `__typename` field: Every object type in your schema automatically has a field named. This field returns the object type's name as a String (e.g. 'ChampionsResultSuccess' or 'Maps'). This field is optional in query.
+- query in React:
+  ```
+  const QUERY_ALL_MAPS_WITH_UNION = gql`
+    query queryAllMaps {
+        maps {
+            ... on MapsResultSuccess {
+                maps {
+                    id
+                    name
+                    players
+                    playable
+                    imageUrl
+                }
+            }
+
+            ... on MapsResultError {
+                message
+            }
+        }
+    }
+  `;
+  ```
+- accessing data in front-end:
+  ```
+  const { data: mapData, loading: mapLoading, error: mapError } = useQuery(QUERY_ALL_MAPS_WITH_UNION);
+  
+  mapData.maps.maps // list of maps
+  ```
+
+## Interface type
+
+- specifies a set of fields that multiple object types can include
+- if an object type implements an interface, it must include all of that interface's fields
+- a field can have an interface (or a list of that interface) as its return type. In this case, it can return any object type that implements that interface
+- ```
+  interface Book {
+  title: String!
+  author: Author!
+  }
+
+  type Textbook implements Book {
+    title: String! # must be present
+    author: Author! # must be present
+    courses: [Course!]!
+  }
+
+  type ColoringBook implements Book {
+    title: String!
+    author: Author!
+    colors: [String!]!
+  }
+
+  type Query {
+    books: [Book!]! # can include Textbook / ColoringBook objects
+  }
+  ```
+- `Query.books` returns a list that can include both Textbooks and ColoringBooks
+- clients can also query for subfields that aren't included in the interface
+  ```
+  query GetBooks {
+    books {
+      # Querying for __typename is almost always recommended,
+      # but it's even more important when querying a field that
+      # might return one of multiple types.
+      __typename
+      title
+      ... on Textbook {
+        courses {
+          # Only present in Textbook
+          name
+        }
+      }
+      ... on ColoringBook {
+        colors # Only present in ColoringBook
+      }
+    }
+  }
+  ```
+- resolving an interface is similar to a union using the `__resolveType` function:
+  ```
+  const resolvers = {
+    Book: {
+      __resolveType(book, contextValue, info){
+        // Only Textbook has a courses field
+        if(book.courses){
+          return 'Textbook';
+        }
+        // Only ColoringBook has a colors field
+        if(book.colors){
+          return 'ColoringBook';
+        }
+        return null; // GraphQLError is thrown
+      },
+    },
+    Query: {
+      books: () => { ... }
+    },
+  };
+  ```
+
+# Appendix: All Apollo Studio queries
+Operation
+```
+query ExampleQuery {
+  # champions {
+  #   id
+  # }
+  hi
+  
+  champions {
+    name
+    id
+  }
+}
+
+query ChampionsQuery {
+  hi
+  champions {
+    id
+    name
+    roles
+    strongAgainst {
+      name
+    }
+  }
+}
+
+query ChampQuery($championId: ID!) {
+  champion(id: $championId) {
+    name
+    roles
+    strongAgainst {
+      name
+    }
+    game
+    abilities
+    whatever
+    midChamps {
+      name
+      roles
+    }
+  }
+  whatever
+}
+
+query MidChampQuery($championId: ID!) {
+  champion(id: $championId) {
+    midChamps {
+      name
+      roles
+    }
+  }
+}
+
+# query removeChamp($removeId: ID!) {
+#   removeChampion(id: $removeId) {
+#     name
+#     id
+#   }
+# }
+
+mutation addChampion($input: addChampionInput!) {
+  addChampion(input: $input) {
+    id
+    name
+    roles
+  }
+}
+
+query getChamps {
+  champions {
+    name
+    id
+    isMeta
+    # roles
+  }
+}
+
+mutation UpdateChampion($updateChampionInput2: updateChampionInput!) {
+  updateChampion(input: $updateChampionInput2) {
+    name
+    id
+    roles
+  }
+}
+
+mutation RemoveChampion($removeChampionId: ID!) {
+  removeChampion(id: $removeChampionId) {
+    id
+    name
+  }
+}
+
+query QueryMaps {
+  maps {
+    id
+    name
+    imageUrl
+  }
+}
+
+query QueryChampByIdOrName($filters: ChampionInputFilter!) {
+  champIdOrName(filters: $filters) {
+    id
+    name
+    # game
+    roles
+  }
+}
+
+query Hello($helloName2: String!) {
+  hello(name: $helloName2)
+}
+
+query Game {
+  hi
+  champions {
+    game
+  }
+}
+
+fragment ChampNameIdFragment on Champion {
+  name
+  id
+}
+
+query FragmentQuery {
+  champions {
+    ...ChampNameIdFragment
+  }
+}
+
+query ChampionsUnionQuery {
+  championsWithUnion {
+    ...on ChampionsResultSuccess {
+      champions {
+         id
+         name
+      }
+    }
+
+    ...on ChampionsResultError {
+      message
+    }
+  }
+}
+
+query MapsUnionQuery {
+  maps {
+    __typename
+    ... on MapsResultSuccess {
+      maps {
+        id
+        name
+      }
+    }
+
+    ... on MapsResultError {
+      message
+    }
+  }
+}
+
+```
+
+Variables
+```
+{
+  "championId": "2",
+  "input": {
+    "name": "LuLu",
+    "roles": ["SUPPORT", "TOP"]
+  },
+  "name": "Zed",
+  "updateChampionId": 1,
+  "newName": "ZeDoroke",
+  "removeChampionId": 3,
+  "filters": {
+    // "name": "Zed",
+    "id": 7
+  },
+  "helloName2": "Brian",
+  "updateChampionInput2": null
+}
+```
