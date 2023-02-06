@@ -31,7 +31,7 @@ const typeDefs = gql`
         champions: [Champion!]!
         champion(id: ID!): Champion
         whatever: String
-        maps: [Map!]!
+        maps: MapsResult
         champIdOrName(filters: ChampionInputFilter!): Champion
         hello(name: String!): String!
         championsWithUnion: ChampionsResult
@@ -75,6 +75,17 @@ const typeDefs = gql`
     }
 
     union ChampionsResult = ChampionsResultSuccess | ChampionsResultError
+
+    # union for Maps
+    type MapsResultSuccess {
+        maps: [Map!]!
+    }
+
+    type MapsResultError {
+        message: String!
+    }
+
+    union MapsResult = MapsResultSuccess | MapsResultError
 `
 
 module.exports = { typeDefs };

@@ -29,7 +29,18 @@ const resolvers = {
 
         maps: () => {
             const mapsFile = fs.readFileSync(`${__dirname}/maps.json`); // must get current working directory first
-            return JSON.parse(mapsFile);
+
+            // simple return with no error handling
+            // return JSON.parse(mapsFile);
+
+            // error handling with union
+            const hasError = false;
+            if (hasError) return { message: 'MAPS ERRORRRRRR' };
+
+            if (mapsFile) {
+                return { maps: JSON.parse(mapsFile) };
+            }
+
         },
         
         champIdOrName: (_parent, args) => {
@@ -52,7 +63,7 @@ const resolvers = {
 
         // using Union
         championsWithUnion: () => {
-            const isError = true;
+            const isError = false;
 
             if (isError) {
                 return { message: 'ERRORRRRRRR' };
@@ -74,6 +85,19 @@ const resolvers = {
             }
 
             return null;
+        }
+    },
+
+    // union for Maps
+    MapsResult: {
+        __resolveType(obj) {
+            if (obj.maps) {
+                return 'MapsResultSuccess';
+            } else if (obj.message) {
+                return 'MapsResultError';
+            } else {
+                return null;
+            }
         }
     },
 
