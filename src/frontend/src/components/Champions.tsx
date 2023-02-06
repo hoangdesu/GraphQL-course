@@ -5,10 +5,14 @@ import ChampionRow, { Champion } from './ChampionRow';
 // GQL STATEMENTS
 
 const GET_ALL_CHAMPS = gql`
+    fragment ChampIdNameFragment on Champion {
+        id
+        name
+    }
+
     query getAllChamps { # this line is optional, if there's no param
         champions {
-            id
-            name
+            ...ChampIdNameFragment
             isMeta
             roles
         }

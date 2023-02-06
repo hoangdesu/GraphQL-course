@@ -63,7 +63,6 @@ const typeDefs = gql`
         removeChampion(id: ID!): Champion
         updateChampion(input: updateChampionInput!): Champion
     }
-
 `
 
 module.exports = { typeDefs };

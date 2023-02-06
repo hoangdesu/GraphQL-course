@@ -5,9 +5,10 @@ const { resolvers } = require('./schema/resolvers');
 const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: () => {
+    context: async ({ req, res }) => {
         return {
-            player: 'Doroke'
+            player: 'Doroke',
+            req
         };
     }
 });
