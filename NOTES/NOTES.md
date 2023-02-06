@@ -609,16 +609,19 @@ A resolver can optionally accept 4 positional arguments in order: `(parent, args
 - ![](20230105173817.png)  
 - parent of top query should be `undefined`. Parent of `game` function should be result of the previous level, which is all the fields from `champions` query
 
-
 #### Context
-- add context when creating a new `ApolloServer` instance as a function returning an object
+
+- add context when creating a new `ApolloServer` instance as a **function** returning an object
+- the context function is called once for every request => can access request's details (such as HTTP headers) through `req` object (`context.req.headers`)
+- context function should be async
 - ```
   const server = new ApolloServer({
       typeDefs,
       resolvers,
-      context: () => {
+      context: async ({ req, res }) => {
           return {
-              player: 'Doroke'
+              player: 'Doroke',
+              req
           };
       }
   });
@@ -629,4 +632,26 @@ A resolver can optionally accept 4 positional arguments in order: `(parent, args
       return `sup ${context.player}`; // sup Doroke
   },
   ```
-// TODO: req object
+
+#### Info
+
+- not many use cases :/
+- can access information about the request, different from the `req` from context
+
+### Fragments
+
+- a piece of logic that can be shared between multiple queries and mutations
+- used on client side for better code organization
+- define fragment `on` a certain type, use the spread operator-like syntax (`...`) 
+- ```
+  fragment ChampNameIdFragment on Champion {
+    name
+    id
+  }
+
+  query FragmentQuery {
+    champions {
+      ...ChampNameIdFragment
+    }
+  }
+  ```
