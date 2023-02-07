@@ -2,13 +2,14 @@ const typeDefs = `#graphql
     type User {
         id: ID!
         name: String!
-        age: Int!
-        nationality: String!
+        age: Int
+        nationality: String
     }    
 
     type Query {
-        users: [Users!]
+        users: [User]!
+        hi: String!
     }
 `;
 
-module.exports = { typeDefs };
+export default typeDefs;

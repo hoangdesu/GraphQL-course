@@ -4,8 +4,9 @@ import Champions from './components/Champions';
 import Maps from './components/Maps';
 
 const App = () => {
+  const PORT = 4001;
   const client = new ApolloClient({
-    uri: 'http://localhost:4000', // apollo server endpoint
+    uri: `http://localhost:${PORT}`, // apollo server endpoint
     cache: new InMemoryCache()
   })
 

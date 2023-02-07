@@ -71,6 +71,8 @@ const Maps = () => {
             </div>
         );
     }
+
+    return <></>;
 };
 
 export default Maps;
