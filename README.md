@@ -1,5 +1,10 @@
 # GraphQL intro course
 
+- [About](#about)
+- [Run](#run)
+- [Project](#project)
+---
+
 ## About
 PedroTech's tutorial: https://www.youtube.com/playlist?list=PLpPqplz6dKxXICtNgHY1tiCPau_AwWAJU
 
@@ -22,3 +27,5 @@ Simple League of Legends's favorite champs app using GraphQL + React
 
 ![](/NOTES/home1.png)
 ![](/NOTES/home2.png) 
+
+

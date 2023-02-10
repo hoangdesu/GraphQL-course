@@ -1,7 +1,48 @@
 ###### tags: `grapql`
 
-Playlist: https://www.youtube.com/playlist?list=PLpPqplz6dKxXICtNgHY1tiCPau_AwWAJU
+## Table of Content
 
+- [1. What is GraphQL](#1-what-is-graphql)
+- [2. Basic Types and Queries](#2-basic-types-and-queries)
+  - [Schema](#schema)
+- [3. GraphQL API With NodeJS and Apollo Server](#3-graphql-api-with-nodejs-and-apollo-server)
+    - [Installation:](#installation)
+    - [Setup server:](#setup-server)
+    - [`typeDefs.js`:](#typedefsjs)
+    - [`resolvers.js`](#resolversjs)
+  - [Querying data](#querying-data)
+- [4. GraphQL resolvers](#4-graphql-resolvers)
+  - [Enumerate types](#enumerate-types)
+  - [Using type in definition](#using-type-in-definition)
+  - [Arguments](#arguments)
+  - [Type can have its own resolvers](#type-can-have-its-own-resolvers)
+- [5. Mutations](#5-mutations)
+- [6. useQuery Hook in Apollo Client](#6-usequery-hook-in-apollo-client)
+    - [Set up frontend client](#set-up-frontend-client)
+    - [Using query hooks](#using-query-hooks)
+      - [`useQuery` hook:](#usequery-hook)
+      - [`useLazyQuery` hook:](#uselazyquery-hook)
+      - [Passing query inputs `variables`:](#passing-query-inputs-variables)
+      - [Using returned query data](#using-returned-query-data)
+- [7. useMutation hook](#7-usemutation-hook)
+    - [Usage:](#usage)
+    - [Define mutation:](#define-mutation)
+    - [Returned values:](#returned-values)
+    - [Providing options:](#providing-options)
+    - [Refetching data:](#refetching-data)
+- [8. Context, Fragments, Union Result Boxes](#8-context-fragments-union-result-boxes)
+  - [Resolver argument](#resolver-argument)
+      - [Parent](#parent)
+      - [Context](#context)
+      - [Info](#info)
+  - [Fragments](#fragments)
+    - [Resolving a union](#resolving-a-union)
+  - [Interface type](#interface-type)
+- [Appendix: All Apollo Studio queries](#appendix-all-apollo-studio-queries)
+
+---
+
+Playlist: https://www.youtube.com/playlist?list=PLpPqplz6dKxXICtNgHY1tiCPau_AwWAJU
 # 1. What is GraphQL
 
 - a query language: a programming language used to get data
@@ -88,7 +129,7 @@ Differences between GgraphQL vs REST
   });
   ```
 
-### `typeDefs.js`:
+### `typeDefs.js`
 
 ```
 const { gql } = require("apollo-server");
@@ -1010,4 +1051,4 @@ Variables
 ```
 
 ![](home1.png)
-![](home2.png)  
+![](home2.png)
