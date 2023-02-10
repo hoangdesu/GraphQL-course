@@ -986,7 +986,6 @@ query MapsUnionQuery {
     }
   }
 }
-
 ```
 
 Variables
