@@ -8,7 +8,7 @@
 - [3. GraphQL API With NodeJS and Apollo Server](#3-graphql-api-with-nodejs-and-apollo-server)
     - [Installation:](#installation)
     - [Setup server:](#setup-server)
-    - [`typeDefs.js`:](#typedefsjs)
+    - [`typeDefs.js`](#typedefsjs)
     - [`resolvers.js`](#resolversjs)
   - [Querying data](#querying-data)
 - [4. GraphQL resolvers](#4-graphql-resolvers)
