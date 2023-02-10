@@ -117,7 +117,7 @@ Differences between GgraphQL vs REST
 - start Apollo server with `server.listen()`
 - `index.js`:
 
-  ```
+  ```graphql
   const { ApolloServer } = require('apollo-server');
   const { typeDefs } = require('./schema/type-defs');
   const { resolvers } = require('./schema/resolvers');
