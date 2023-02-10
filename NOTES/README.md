@@ -62,7 +62,7 @@ Differences between GgraphQL vs REST
 - Graphql playground
 - has 5 scalar (basic) data types: `ID`, `String`, `Int`, `Float`, `Boolean`
 - defined with keyword `type`, similar to TypeScript. e.g.:
-  ```
+  ```gql
   type User {
     id: ID!
     name: String!
